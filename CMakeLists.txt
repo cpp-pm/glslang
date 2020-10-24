@@ -31,16 +31,25 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-project(glslang
-    LANGUAGES CXX)
-
 # increase to 3.1 once all major distributions
-# include a version of CMake >= 3.1
-cmake_minimum_required(VERSION 2.8.12)
+# include a version of CMake >= 3.2
+cmake_minimum_required(VERSION 3.2)
 if (POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif()
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+include(cmake/HunterGate.cmake)
+HunterGate(
+    URL "https://github.com/cpp-pm/hunter/archive/v0.23.279.tar.gz"
+    SHA1 "0a8ede485c3e9c1ceed8ccb989ab6c0aba1f4db7"
+    FILEPATH "${CMAKE_CURRENT_LIST_DIR}/cmake/HunterConfig.cmake"
+)
+
+project(glslang VERSION 10.15.3847)
+
+hunter_add_package(SPIRV-Tools)
+find_package(SPIRV-Tools CONFIG REQUIRED)
 
 # Enable compile commands database
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -326,6 +335,8 @@ else()
     add_definitions(-DENABLE_OPT=0)
 endif()
 
+set(targets_export_name "${PROJECT_NAME}-targets")
+
 add_subdirectory(glslang)
 add_subdirectory(OGLCompilersDLL)
 if(ENABLE_GLSLANG_BINARIES)
@@ -361,3 +372,16 @@ if(ENABLE_CTEST AND BUILD_TESTING)
         COMMAND bash ${IGNORE_CR_FLAG} runtests ${RESULTS_PATH} ${VALIDATOR_PATH} ${REMAP_PATH}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Test/)
 endif()
+
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+set(version_config "${generated_dir}/${PROJECT_NAME}-config-version.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}-config.cmake")
+set(namespace "${PROJECT_NAME}::")
+set(project_version "10.15.3847")
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file("${version_config}" VERSION "${project_version}" COMPATIBILITY SameMajorVersion)
+configure_package_config_file("cmake/config.cmake.in" "${project_config}" INSTALL_DESTINATION "${config_install_dir}")
+install(FILES "${project_config}" "${version_config}" DESTINATION "${config_install_dir}")
+install(EXPORT "${targets_export_name}" NAMESPACE "${namespace}" DESTINATION "${config_install_dir}")
