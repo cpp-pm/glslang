@@ -46,7 +46,7 @@ HunterGate(
     FILEPATH "${CMAKE_CURRENT_LIST_DIR}/cmake/HunterConfig.cmake"
 )
 
-project(glslang VERSION 10.15.3847)
+project(glslang VERSION 8.13.3743)
 
 hunter_add_package(SPIRV-Tools)
 find_package(SPIRV-Tools CONFIG REQUIRED)
