@@ -200,17 +200,17 @@ endif(WIN32)
 if(ENABLE_GLSLANG_INSTALL)
     if(BUILD_SHARED_LIBS)
         install(TARGETS glslang
-                EXPORT  glslangTargets
+                EXPORT  ${targets_export_name}
                 ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
                 LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
                 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
     else()
         install(TARGETS glslang MachineIndependent GenericCodeGen
-                EXPORT  glslangTargets
+                EXPORT  ${targets_export_name}
                 ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
     endif()
 
-    install(EXPORT glslangTargets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+    install(EXPORT ${targets_export_name} DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
 
     set(ALL_HEADERS
         ${GLSLANG_HEADERS}
